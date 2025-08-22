@@ -2,6 +2,7 @@
   "name": "notionapi",
   "version": "1.0.0",
   "description": "��#\u0000 \u0000N\u0000o\u0000t\u0000i\u0000o\u0000n\u0000A\u0000P\u0000I\u0000\r\u0000 \u0000",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,6 +19,9 @@
   },
   "homepage": "https://github.com/shartano/NotionAPI#readme",
   "dependencies": {
-    "@notionhq/client": "^4.0.2"
+    "@notionhq/client": "^4.0.2",
+    "dotenv": "^17.2.1",
+    "global-agent": "^3.0.0",
+    "win-ca": "^3.5.1"
   }
 }
