@@ -11,35 +11,42 @@ const apiKey = process.env.NOTION_API_KEY;
 const notion = new Client({ auth: apiKey });
 
 
-const newTimesheets = [];
-const delTimesheets = [];
-
-//compare tasks and timesheets to track which need to be deleted/added
 async function cmpLists(tasks, timesheets) {
-    try {
-        for (const task of tasks) {
-            const exists = timesheets.some(ts => {
-                const tsTask = ts.name.split(" - ")[1]?.trim();
-                return tsTask === task.name;
-            });
-            if (!exists) {
-                newTimesheets.push(task);
-            }
-        }
+    const newTimesheets = [];
+    const delTimesheets = [];
 
-        for (const ts of timesheets) {
+    console.log("Tasks:", tasks.map(t => t.name));
+    console.log("Timesheets:", timesheets.map(ts => ts.name));
+
+    // Find tasks that are missing a timesheet
+    for (const task of tasks) {
+        const exists = timesheets.some(ts => {
             const tsTask = ts.name.split(" - ")[1]?.trim();
-            const exists = tasks.some(task => task.name === tsTask);
-            if (!exists) {
-                delTimesheets.push(ts);
-            }
+            return tsTask.toLowerCase() === task.name.toLowerCase();
+        });
+        if (!exists) {
+            console.log("Task missing timesheet:", task.name);
+            newTimesheets.push(task);
         }
-
-        return { newTimesheets, delTimesheets };
-    } catch (err) {
-        console.error("Error comparing name lists: ", err);
     }
+
+    // Find timesheets that don't have a matching task
+    for (const ts of timesheets) {
+        const tsTask = ts.name.split(" - ")[1]?.trim();
+        const exists = tasks.some(task => task.name.toLowerCase() === tsTask.toLowerCase());
+        if (!exists) {
+            console.log("Timesheet has no matching task:", ts.name);
+            delTimesheets.push(ts);
+        }
+    }
+
+    console.log("Final newTimesheets:", newTimesheets.map(t => t.name));
+    console.log("Final delTimesheets:", delTimesheets.map(ts => ts.name));
+
+    return { newTimesheets, delTimesheets };
 }
+
+
 
 
 async function fetchTasks(tasks){
@@ -164,6 +171,7 @@ async function main() {
         console.log("Adding new timesheets ", );
        }
 
+        console.log("Adding new timesheets " , cmp.newTimesheets ,"\ndeleting ", cmp.delTimesheets);
 
     await deleteTimesheets(cmp.delTimesheets);
     await createTimesheets(cmp.newTimesheets, page);
