@@ -21,8 +21,8 @@ async function cmpLists(tasks, timesheets) {
     // Find tasks that are missing a timesheet
     for (const task of tasks) {
         const exists = timesheets.some(ts => {
-            const tsTask = ts.name.split(" - ")[1]?.trim();
-            return tsTask.toLowerCase() === task.name.toLowerCase();
+            const tsTask = ts.name.split("-")?.[1]?.trim();
+            return tsTask?.toLowerCase() === task.name.toLowerCase();
         });
         if (!exists) {
             console.log("Task missing timesheet:", task.name);
@@ -32,8 +32,8 @@ async function cmpLists(tasks, timesheets) {
 
     // Find timesheets that don't have a matching task
     for (const ts of timesheets) {
-        const tsTask = ts.name.split(" - ")[1]?.trim();
-        const exists = tasks.some(task => task.name.toLowerCase() === tsTask.toLowerCase());
+        const tsTask = ts.name.split("-")?.[1]?.trim();
+        const exists = tasks.some(task => task.name.toLowerCase() === tsTask?.toLowerCase());
         if (!exists) {
             console.log("Timesheet has no matching task:", ts.name);
             delTimesheets.push(ts);
@@ -124,9 +124,6 @@ async function createTimesheets(tasks, page){
         }
 
         const docName = ownerName + " - " + tsk.name + " - " ;
-
-
-        
 
         try{
             const response = await notion.pages.create({
