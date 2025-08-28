@@ -7,9 +7,7 @@ const DocDB = process.env.DOC_DB_ID;
 const TsDB = process.env.TS_DB_ID;
 const apiKey = process.env.NOTION_API_KEY;
 
-
 const notion = new Client({ auth: apiKey });
-
 
 async function cmpLists(tasks, timesheets) {
     const newTimesheets = [];
@@ -39,15 +37,11 @@ async function cmpLists(tasks, timesheets) {
             delTimesheets.push(ts);
         }
     }
-
     console.log("Final newTimesheets:", newTimesheets.map(t => t.name));
     console.log("Final delTimesheets:", delTimesheets.map(ts => ts.name));
 
     return { newTimesheets, delTimesheets };
 }
-
-
-
 
 async function fetchTasks(tasks){
 
@@ -59,7 +53,6 @@ async function fetchTasks(tasks){
             const name = page.properties.Name.title
                 .map(name => name.plain_text)
                 .join("");
-
 
             taskNames.push({name: name, id: task.id});
             num++;
@@ -82,7 +75,6 @@ async function fetchTimesheets(timesheets){
                 .map(name => name.plain_text)
                 .join("");
 
-
             timesheetNames.push({name: name, id: timesheet.id});
             num++;
         }
@@ -104,10 +96,7 @@ async function deleteTimesheets(timesheets){
         }catch(err){
             console.error("Failed to archive page: " , err)
         }
-        
-        
     }
-         
 }
 
 
@@ -122,9 +111,7 @@ async function createTimesheets(tasks, page){
             console.log("Skipping task due to missing required info:", tsk.name, docOwner, teamID);
             continue;
         }
-
         const docName = ownerName + " - " + tsk.name + " - " ;
-
         try{
             const response = await notion.pages.create({
                 parent: {database_id: TsDB},
@@ -157,9 +144,6 @@ async function main() {
     const response = await notion.databases.query({ database_id: DocDB });
 
     const page = response.results[0];
-
-    
-
     const taskNames = await fetchTasks(page.properties.Tasks.relation);
     const timesheetNames = await fetchTimesheets(page.properties.TimeSheets.relation);
     const cmp = await cmpLists(taskNames, timesheetNames);
@@ -178,7 +162,5 @@ async function main() {
     console.error("Error querying Notion:", err.message);
   }
 }
-
-
 
 main();
